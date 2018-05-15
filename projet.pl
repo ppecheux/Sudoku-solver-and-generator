@@ -1,4 +1,5 @@
 % Porojet de IA2
+chiffre([1,2,3,4,5,6,7,8,9]).
 
 /*grille([
 a1,a2,a3,a4,a5,a6,a7,a8,a9,
@@ -59,15 +60,15 @@ col9([a9,b9,c9,d9,e9,f9,g9,h9,i9]).
 
 indiceElement(I,J,N):-N is I*9+J.
 
-GetElement(_,_,[],_):-write("la case correspondante n'existe pas").
+GetElement(_,_,[],_):-write("la case correspondante n'existe pas"),!.
 GetElement(0,0,[X|_],X).
 GetElement(I,J,[_|L],X):-N is I*9+J-1, I2 is N/9, J2 is N-I2, getElement(I2,J2,[L],X).
 
-GetLigne(_,[],_):-write("la ligne correspondante n'existe pas").
-GetLigne(I,[G],[L]):- getElement(I,_,[G],X). %trouver un moyen de rassembler les resultats de cette requette dans une liste
+GetLigne(_,[],_):-write("la ligne correspondante n'existe pas"),!.
+GetLigne(I,[G],[L]):- setof(X, getElement(I,_,[G],X),L) . %trouver un moyen de rassembler les resultats de cette requette dans une liste
 
-GetCol(_,[],_):-write("la colonne correspondante n'existe pas").
-GetLigne(J,[G],[L]):- getElement(_,J,[G],X).
+GetCol(_,[],_):-write("la colonne correspondante n'existe pas"),!.
+GetLigne(J,[G],[L]):- setof(X,getElement(_,J,[G],X),L).
 
 %LES CARRES SONT IDENTIFIES PAR LES INDICES DE LA CASE EN HAUT A GAUCHE DU CARRE
 GetCarre(I,J,[G],[L]):-getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement(I+2,J,G,Ai2j),
@@ -75,12 +76,63 @@ GetCarre(I,J,[G],[L]):-getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement
                         getElement(I,J+2,G,Aij2),getElement(I+1,J+2,G,Ai1j2),getElement(I+2,J+2,G,Ai2j2),
                         L is [Aij,Ai1j,Ai2j,Aij1,Ai1j1,Ai2j1,Aij2,Ai1j2,Ai2j2].
 
-ValideSudoku(G):- ValideGrille(grilecolonne), ValideGrile(grilleligne), ValideGrille(grillecarre).
 
-ValideGrille([]):- !.
-ValideGrille([A|B]):- Valideliste(A), ValideGrille(B).
+%quel nom de variable pour le 3 e argument desetof dans validListe?
+ValideGrille([]):- write("la grille est vide"),!.
+ValideGrille([G]):- Valideliste(setof(L,GetLigne(_,G,L),M)),
+                    Valideliste(setof(L,GetCol(_,G,L),N)),
+                    GetCarre(0,0,G,UL),GetCarre(3,0,G,UM),GetCarre(6,0,G,UR),
+                    GetCarre(0,3,G,ML),GetCarre(3,3,G,MM),GetCarre(6,3,G,MR),
+                    GetCarre(0,6,G,LL),GetCarre(3,6,G,LM),GetCarre(6,6,G,DR),
+                    Valideliste([UL]),Valideliste([UL]),Valideliste([UL]),
+                    Valideliste([UL]),Valideliste([UL]),Valideliste([UL]),
+                    Valideliste([UL]),Valideliste([UL]),Valideliste([UL]).
 
 Valideliste([]):- !.
 Valideliste([X|A]):- ValideElement(X, A),Valideliste(A).
 
-ValideElement(X, [Y|Z]):- X\=Y, ValideElement (X,Z).
+ValideElement(X, []).
+ValideElement(X, [Y|Z]):- X\=Y,In(X,Chiffre), ValideElement (X,Z).
+
+In(X,[]):-write("l'element n'est pas dans la liste"),!.
+In(X,[X,_]).
+In(X,[Y,L]):-In(X,L).
+
+%pour imprimer un tableau sous forme de sudoku
+printGrid([],_,_) :- !.
+
+printGrid(G) :-
+  printTraitH(2),
+  printGrid(G,0,0),
+  nl,write('------------------').
+
+printGrid(G,I,9) :-%pour commencer une nouvelle ligne
+  !,
+  printTraitH(I),
+  I1 is I + 1,
+  printGrid(G,I1,0).
+
+printGrid([Aij|G],I,J) :-
+  write(Aij),
+  printVSep(J),
+  J1 is J + 1,
+  printGrid(G,I,J1).
+
+printVSep(J) :-
+  mult3(J+4), !,
+  write('|').
+
+printVSep(_) :- write(' ').
+
+printTraitH(I) :-
+  mult3(I+1), !,
+  nl, write('-------------------'), nl,
+  write('|').
+
+printTraitH(_) :-
+  nl, write('|').
+
+
+mult3(N) :-
+  T is (N mod 3),
+  T == 0.
