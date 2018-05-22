@@ -60,18 +60,18 @@ col9([a9,b9,c9,d9,e9,f9,g9,h9,i9]).
 
 indiceElement(I,J,N):-N is I*9+J.
 
-GetElement(_,_,[],_):-write("la case correspondante n'existe pas"),!.
-GetElement(0,0,[X|_],X).
-GetElement(I,J,[_|L],X):-N is I*9+J-1, I2 is N/9, J2 is N-I2, getElement(I2,J2,[L],X).
+getElement(_,_,[],_):-write("la case correspondante n'existe pas"),!.
+getElement(0,0,[X|_],X).
+getElement(I,J,[_|L],X):-N is I*9+J-1, I2 is N/9, J2 is N-I2, getElement(I2,J2,[L],X).
 
-GetLigne(_,[],_):-write("la ligne correspondante n'existe pas"),!.
-GetLigne(I,[G],[L]):- setof(X, getElement(I,_,[G],X),L) . %trouver un moyen de rassembler les resultats de cette requette dans une liste
+getLigne(_,[],_):-write("la ligne correspondante n'existe pas"),!.
+getLigne(I,[G],[L]):- setof(X, getElement(I,_,[G],X),L) . %trouver un moyen de rassembler les resultats de cette requette dans une liste
 
-GetCol(_,[],_):-write("la colonne correspondante n'existe pas"),!.
-GetLigne(J,[G],[L]):- setof(X,getElement(_,J,[G],X),L).
+getCol(_,[],_):-write("la colonne correspondante n'existe pas"),!.
+getLigne(J,[G],[L]):- setof(X,getElement(_,J,[G],X),L).
 
 %LES CARRES SONT IDENTIFIES PAR LES INDICES DE LA CASE EN HAUT A GAUCHE DU CARRE
-GetCarre(I,J,[G],[L]):-getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement(I+2,J,G,Ai2j),
+getCarre(I,J,[G],[L]):-getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement(I+2,J,G,Ai2j),
                         getElement(I,J+1,G,Aij1),getElement(I+1,J+1,G,Ai1j1),getElement(I+2,J+1,G,Ai2j1),
                         getElement(I,J+2,G,Aij2),getElement(I+1,J+2,G,Ai1j2),getElement(I+2,J+2,G,Ai2j2),
                         L is [Aij,Ai1j,Ai2j,Aij1,Ai1j1,Ai2j1,Aij2,Ai1j2,Ai2j2].
@@ -79,11 +79,11 @@ GetCarre(I,J,[G],[L]):-getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement
 
 %quel nom de variable pour le 3 e argument desetof dans validListe?
 ValideGrille([]):- write("la grille est vide"),!.
-ValideGrille([G]):- Valideliste(setof(L,GetLigne(_,G,L),M)),
-                    Valideliste(setof(L,GetCol(_,G,L),N)),
-                    GetCarre(0,0,G,UL),GetCarre(3,0,G,UM),GetCarre(6,0,G,UR),
-                    GetCarre(0,3,G,ML),GetCarre(3,3,G,MM),GetCarre(6,3,G,MR),
-                    GetCarre(0,6,G,LL),GetCarre(3,6,G,LM),GetCarre(6,6,G,DR),
+ValideGrille([G]):- Valideliste(setof(L,getLigne(_,G,L),M)),
+                    Valideliste(setof(L,getCol(_,G,L),N)),
+                    getCarre(0,0,G,UL),getCarre(3,0,G,UM),getCarre(6,0,G,UR),
+                    getCarre(0,3,G,ML),getCarre(3,3,G,MM),getCarre(6,3,G,MR),
+                    getCarre(0,6,G,LL),getCarre(3,6,G,LM),getCarre(6,6,G,DR),
                     Valideliste([UL]),Valideliste([UL]),Valideliste([UL]),
                     Valideliste([UL]),Valideliste([UL]),Valideliste([UL]),
                     Valideliste([UL]),Valideliste([UL]),Valideliste([UL]).
@@ -99,40 +99,47 @@ In(X,[X,_]).
 In(X,[Y,L]):-In(X,L).
 
 %pour imprimer un tableau sous forme de sudoku
-printGrid([],_,_) :- !.
+listToSudoku([],_,_) :- !.
 
-printGrid(G) :-
-  printTraitH(2),
-  printGrid(G,0,0),
+listToSudoku(G) :-
+  afficherColonneSudoku(2),
+  listToSudoku(G,0,0),
   nl,write('------------------').
 
-printGrid(G,I,9) :-%pour commencer une nouvelle ligne
+listToSudoku(G,I,9) :-%pour commencer une seule ligne
   !,
-  printTraitH(I),
+  afficherColonneSudoku(I),
   I1 is I + 1,
-  printGrid(G,I1,0).
+  listToSudoku(G,I1,0).
 
-printGrid([Aij|G],I,J) :-
+listToSudoku([Aij|G],I,J) :-
   write(Aij),
-  printVSep(J),
+  afficherLigneSudoku(J),
   J1 is J + 1,
-  printGrid(G,I,J1).
+  listToSudoku(G,I,J1).
 
-printVSep(J) :-
-  mult3(J+4), !,
+
+afficherLigneSudoku(J) :-
+  egale2modulo3(J), !,
+  %(J mod 3)==2, !,
   write('|').
 
-printVSep(_) :- write(' ').
+afficherLigneSudoku(_) :- write(' ').
 
-printTraitH(I) :-
-  mult3(I+1), !,
+afficherColonneSudoku(I) :-
+  egale2modulo3(I), !,
   nl, write('-------------------'), nl,
   write('|').
 
-printTraitH(_) :-
+afficherColonneSudoku(_) :-
   nl, write('|').
 
 
-mult3(N) :-
-  T is (N mod 3),
-  T == 0.
+egale2modulo3(N) :-
+  I is (N mod 3),
+  I == 2.
+
+  % listToSudoku([8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1]).
+ %listToSudoku([8,0,4,0,0,0,2,0,9]).
+  %listToSudoku([8,0,4,0,0,0,2,0,9]).
+  %getLigne(1,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],L).
