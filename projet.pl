@@ -70,7 +70,7 @@ getLigne(I,[G],[L]):- setof(X, getElement(I,_,[G],X),L) . %trouver un moyen de r
 getCol(_,[],_):-write("la colonne correspondante n'existe pas"),!.
 getLigne(J,[G],[L]):- setof(X,getElement(_,J,[G],X),L).
 
-%LES CARRES SONT IDENTIFIES PAR LES INDICES DE LA CASE EN HAUT A GAUCHE DU CARRE
+%LES CARRES SONT IDENTIFIES PAR LES iNDICES DE LA CASE EN HAUT A GAUCHE DU CARRE
 getCarre(I,J,[G],[L]):-getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement(I+2,J,G,Ai2j),
                         getElement(I,J+1,G,Aij1),getElement(I+1,J+1,G,Ai1j1),getElement(I+2,J+1,G,Ai2j1),
                         getElement(I,J+2,G,Aij2),getElement(I+1,J+2,G,Ai1j2),getElement(I+2,J+2,G,Ai2j2),
@@ -78,39 +78,44 @@ getCarre(I,J,[G],[L]):-getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement
 
 
 %quel nom de variable pour le 3 e argument desetof dans validListe?
-ValideGrille([]):- write("la grille est vide"),!.
-ValideGrille([G]):- Valideliste(setof(L,getLigne(_,G,L),M)),
-                    Valideliste(setof(L,getCol(_,G,L),N)),
+valideGrille([]):- write("la grille est vide"),!.
+valideGrille([G]):- valideliste(setof(L,getLigne(_,G,L),M)),
+                    valideliste(setof(L,getCol(_,G,L),N)),
                     getCarre(0,0,G,UL),getCarre(3,0,G,UM),getCarre(6,0,G,UR),
                     getCarre(0,3,G,ML),getCarre(3,3,G,MM),getCarre(6,3,G,MR),
                     getCarre(0,6,G,LL),getCarre(3,6,G,LM),getCarre(6,6,G,DR),
-                    Valideliste([UL]),Valideliste([UL]),Valideliste([UL]),
-                    Valideliste([UL]),Valideliste([UL]),Valideliste([UL]),
-                    Valideliste([UL]),Valideliste([UL]),Valideliste([UL]).
+                    valideliste([UL]),valideliste([UL]),valideliste([UL]),
+                    valideliste([UL]),valideliste([UL]),valideliste([UL]),
+                    valideliste([UL]),valideliste([UL]),valideliste([UL]).
 
-Valideliste([]):- !.
-Valideliste([X|A]):- ValideElement(X, A),Valideliste(A).
+valideliste([]):- !.
+valideliste([X|A]):- valideElement(X, A),valideliste(A).
 
-ValideElement(X, []).
-ValideElement(X, [Y|Z]):- X\=Y,In(X,Chiffre), ValideElement (X,Z).
+valideElement(X, []).
+valideElement(X, [Y|Z]):- X\=Y,in(X,Chiffre), valideElement (X,Z).
 
-In(X,[]):-write("l'element n'est pas dans la liste"),!.
-In(X,[X,_]).
-In(X,[Y,L]):-In(X,L).
+in(X,[]):-write("l'element n'est pas dans la liste"),!.
+in(X,[X,_]).
+in(X,[Y,L]):-in(X,L).
 
-%pour imprimer un tableau sous forme de sudoku
+  %%%%%IMPRESSION DU SUDOKU%%%%%%%
+
+
+  modulo(N,M,R) :-
+  I is (N mod M),
+  I == R.
+
 listToSudoku([],_,_) :- !.
-
+	
 listToSudoku(G) :-
-  afficherColonneSudoku(2),
+  afficherColonneSudoku(2),%ligne du haut
   listToSudoku(G,0,0),
-  nl,write('------------------').
+  printPlate(2).%ligne du bas
 
-listToSudoku(G,I,9) :-%pour commencer une seule ligne
-  !,
+listToSudoku(G,I,9) :- %pour commencer une seule ligne
+  !, %On a qu'une seule facon d'afficher notre sudoku donc on met un cut
   afficherColonneSudoku(I),
-  I1 is I + 1,
-  listToSudoku(G,I1,0).
+  listToSudoku(G,I+1,0).
 
 listToSudoku([Aij|G],I,J) :-
   write(Aij),
@@ -118,26 +123,22 @@ listToSudoku([Aij|G],I,J) :-
   J1 is J + 1,
   listToSudoku(G,I,J1).
 
-
 afficherLigneSudoku(J) :-
-  egale2modulo3(J), !,
-  %(J mod 3)==2, !,
-  write('|').
-
-afficherLigneSudoku(_) :- write(' ').
+  modulo(J,3,2), !,
+  write('|');
+  write(' ').
 
 afficherColonneSudoku(I) :-
-  egale2modulo3(I), !,
-  nl, write('-------------------'), nl,
-  write('|').
+ printPlate(I),
+ nl,write('|').
 
-afficherColonneSudoku(_) :-
-  nl, write('|').
+printPlate(I):-
+modulo(I,3,2),!,
+ nl, write('-------------------');
+ true.
 
 
-egale2modulo3(N) :-
-  I is (N mod 3),
-  I == 2.
+  %%%%%TESTS DES PREDICATS%%%%%%%
 
   % listToSudoku([8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1]).
  %listToSudoku([8,0,4,0,0,0,2,0,9]).
