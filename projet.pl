@@ -100,43 +100,36 @@ in(X,[Y,L]):-in(X,L).
 
   %%%%%IMPRESSION DU SUDOKU%%%%%%%
 
+congru(N,M,R) :-
+	I is (N mod M),
+	I == R.
 
-  modulo(N,M,R) :-
-  I is (N mod M),
-  I == R.
+listToSudoku([],_) :- !.
 
-listToSudoku([],_,_) :- !.
-	
+listToSudoku([Aij|G],A):-
+	write(Aij),
+	hSeparator(A),
+	vSeparator(A),
+	A1=A+1,
+	listToSudoku(G,A1).
+
+hSeparator(A):-
+	congru(A,3,2),!,write('|');
+	write(' ').
+
+vSeparator(A):-
+	cvSeparator(A),
+	congru(A,9,8),!,nl,write('|');
+	true.
+
+cvSeparator(A):-
+	congru(A,27,26),!,
+	nl, write('-------------------');
+	true.
+
 listToSudoku(G) :-
-  afficherColonneSudoku(2),%ligne du haut
-  listToSudoku(G,0,0),
-  printPlate(2).%ligne du bas
-
-listToSudoku(G,I,9) :- %pour commencer une seule ligne
-  !, %On a qu'une seule facon d'afficher notre sudoku donc on met un cut
-  afficherColonneSudoku(I),
-  listToSudoku(G,I+1,0).
-
-listToSudoku([Aij|G],I,J) :-
-  write(Aij),
-  afficherLigneSudoku(J),
-  J1 is J + 1,
-  listToSudoku(G,I,J1).
-
-afficherLigneSudoku(J) :-
-  modulo(J,3,2), !,
-  write('|');
-  write(' ').
-
-afficherColonneSudoku(I) :-
- printPlate(I),
- nl,write('|').
-
-printPlate(I):-
-modulo(I,3,2),!,
- nl, write('-------------------');
- true.
-
+  vSeparator(-1),%ligne du haut
+  listToSudoku(G,0).
 
   %%%%%TESTS DES PREDICATS%%%%%%%
 
