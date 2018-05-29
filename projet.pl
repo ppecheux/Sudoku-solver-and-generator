@@ -63,11 +63,11 @@ getElement(0,0,[X|_],X):-!.
 getElement(0,J,[_|L],X):- 
 
 	J2 is J-1,
-	getElement(I2,J2,L,X).
+	getElement(I2,J2,L,X),!.
 
 getElement(I,J,[_,_,_,_,_,_,_,_,_|L],X):-
 	I2 is I-1,
-	getElement(I2,J,L,X).
+	getElement(I2,J,L,X),!.
 
 
 getLigne(_,[],_):-write("la ligne correspondante n'existe pas"),!.
