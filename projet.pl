@@ -58,11 +58,17 @@ col9([a9,b9,c9,d9,e9,f9,g9,h9,i9]).
 
 %on considère que les lignes et le colonnes commencent à 0.
 
-indiceElement(I,J,N):-N is I*9+J.
+getElement(_,_,[],_):-!.
+getElement(0,0,[X|_],X):-!.
+getElement(0,J,[_|L],X):- 
 
-getElement(_,_,[],_):-write("la case correspondante n'existe pas"),!.
-getElement(0,0,[X|_],X).
-getElement(I,J,[_|L],X):-N is I*9+J-1, I2 is N/9, J2 is N-I2, getElement(I2,J2,[L],X).
+	J2 is J-1,
+	getElement(I2,J2,L,X).
+
+getElement(I,J,[_,_,_,_,_,_,_,_,_|L],X):-
+	I2 is I-1,
+	getElement(I2,J,L,X).
+
 
 getLigne(_,[],_):-write("la ligne correspondante n'existe pas"),!.
 getLigne(I,[G],[L]):- setof(X, getElement(I,_,[G],X),L) . %trouver un moyen de rassembler les resultats de cette requette dans une liste
@@ -124,7 +130,7 @@ vSeparator(A):-
 
 cvSeparator(A):-
 	congru(A,27,26),!,
-	nl, write('-------------------');
+	nl, write(' -----+-----+-----');
 	true.
 
 listToSudoku(G) :-
@@ -137,3 +143,6 @@ listToSudoku(G) :-
  %listToSudoku([8,0,4,0,0,0,2,0,9]).
   %listToSudoku([8,0,4,0,0,0,2,0,9]).
   %getLigne(1,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],L).
+%getElement(0,0,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
+%getElement(0,1,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
+%getElement(0,2,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
