@@ -78,8 +78,6 @@ getLigne(_,[],_):-write("la ligne correspondante n'existe pas"),!.
 getLigne(I,G,L):- setof(X, getElement(I,_,G,X),L).
  %trouver un moyen de rassembler les resultats de cette requette dans une liste
 
-ajouterElementList(T,L,[T|L]).
-
 getCol(_,[],_):-write("la colonne correspondante n'existe pas"),!.
 getCol(J,G,L):- setof(X,getElement(_,J,G,X),L).
 
@@ -93,16 +91,21 @@ getCol2(J,[T|G],[T|L],C):-
 	C1 is C+1,
 	getCol2(J,G,L,C1).
 
+getCol2(J,[T|G],[_,_,_,_,_,_,_,_|L],C):- 
+	congru(C,9,J-8),!,
+	C1 is C+8,
+	getCol2(J,G,L,C1).
+
 getCol2(J,[T|G],L,C):-
 	C1 is C+1,
 	getCol2(J,G,L,C1).
 
 %LES CARRES SONT IDENTIFIES PAR LES iNDICES DE LA CASE EN HAUT A GAUCHE DU CARRE
-getCarre(I,J,G,[Aij,Ai1j,Ai2j,Aij1,Ai1j1,Ai2j1,Aij2,Ai1j2,Ai2j2]):-getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement(I+2,J,G,Ai2j),
-                        getElement(I,J+1,G,Aij1),getElement(I+1,J+1,G,Ai1j1),getElement(I+2,J+1,G,Ai2j1),
-                        getElement(I,J+2,G,Aij2),getElement(I+1,J+2,G,Ai1j2),getElement(I+2,J+2,G,Ai2j2),!.
-                        %L is [Aij,Ai1j,Ai2j,Aij1,Ai1j1,Ai2j1,Aij2,Ai1j2,Ai2j2].
-
+%ATTENTION IL DONNE DEUX SOLUTIONS PUIS ENVOIE FALSE
+getCarre(I,J,G,[Aij,Ai1j,Ai2j,Aij1,Ai1j1,Ai2j1,Aij2,Ai1j2,Ai2j2]):-
+	getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement(I+2,J,G,Ai2j),
+    getElement(I,J+1,G,Aij1),getElement(I+1,J+1,G,Ai1j1),getElement(I+2,J+1,G,Ai2j1),
+    getElement(I,J+2,G,Aij2),getElement(I+1,J+2,G,Ai1j2),getElement(I+2,J+2,G,Ai2j2).
 
 %quel nom de variable pour le 3 e argument desetof dans validListe?
 valideGrille([]):- write("la grille est vide"),!.
@@ -167,3 +170,4 @@ listToSudoku(G) :-
 %getElement(0,0,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
 %getElement(0,1,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
 %getElement(0,2,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
+%grille(L),listToSudoku(L),getElement(5,5,L,E),getLigne2(2,L,M),getCol1(2,L,C),getCarre(3,3,L,K).
