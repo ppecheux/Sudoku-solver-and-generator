@@ -1,5 +1,5 @@
 % Porojet de IA2
-chiffre([1,2,3,4,5,6,7,8,9]).
+chiffre([1,2,3,4,5,6,7,8,9,0]).
 
 /*grille([
 a1,a2,a3,a4,a5,a6,a7,a8,a9,
@@ -91,7 +91,7 @@ getCol2(J,[T|G],[T|L],C):-
 	getCol2(J,G,L,C1),!.
 
 getCol2(J,[T|G],[_,_,_,_,_,_,_,_|L],C):-
-	Rest=J+1 
+	Rest=J+1,
 	congru(C,9,Rest),!,
 	C1 is C+8,
 	getCol2(J,G,L,C1).
@@ -123,26 +123,49 @@ getCarreAIJ(I,J,G,L):-
 
 %quel nom de variable pour le 3 e argument desetof dans validListe?
 valideGrille([]):- write("la grille est vide"),!.
-valideGrille([G]):- valideliste(setof(L,getLigne(_,G,L),M)),
-                    valideliste(setof(L,getCol(_,G,L),N)),
-                    getCarre(0,0,G,UL),getCarre(3,0,G,UM),getCarre(6,0,G,UR),
+valideGrille(G):-getCarre(0,0,G,UL),getCarre(3,0,G,UM),getCarre(6,0,G,UR),
                     getCarre(0,3,G,ML),getCarre(3,3,G,MM),getCarre(6,3,G,MR),
                     getCarre(0,6,G,LL),getCarre(3,6,G,LM),getCarre(6,6,G,DR),
-                    valideliste([UL]),valideliste([UL]),valideliste([UL]),
-                    valideliste([UL]),valideliste([UL]),valideliste([UL]),
-                    valideliste([UL]),valideliste([UL]),valideliste([UL]).
+                    valideliste(UL),valideliste(UM),valideliste(UR),
+                    valideliste(UL),valideliste(UL),valideliste(UL),
+                    valideliste(UL),valideliste(UL),valideliste(UL),!.
 
-valideliste([]):- !.
-valideliste([X|A]):- valideElement(X, A),valideliste(A).
+valideGrilleTest(G):-getCarre(0,0,G,C),valideliste(C),!.
+
+valideLignesCols(G,-1).
+valideLignesCols(G,K):-
+	getCol1(K,G,J),
+	getLigne2(K,G,I),
+	valideliste(J),
+	valideliste(I),
+	K1=K-1,
+	valideLignesCols(G,K1),!.
+
+valideLignes(G,1):-!.
+valideLignes(G,K):-
+	getLigne2(K,G,I),
+	valideliste(I),
+	K1=K-1,
+	valideLignes(G,K1).
+
+
+%Complexite de O(n3) pour valide liste avec n=9 pour le sudoku 9*9.
+
+valideliste([]).
+valideliste([X|A]):- valideElementRapide(X, A),valideliste(A),!.
 
 valideElement(X, []).
-valideElement(X, [Y|Z]):- X\=Y,in(X,Chiffre), valideElement(X,Z).
+valideElement(X, [Y|Z]):- X\=Y,chiffre(C),in(X,C), valideElement(X,Z),!.
 
-in(X,[]):-write("l'element n'est pas dans la liste"),!.
-in(X,[X,_]).
-in(X,[Y,L]):-in(X,L).
+valideElementRapide(X, []).
+valideElementRapide(X, [Y|Z]):-X\=Y,valideElementRapide(X,Z),!.
+in(X,[]):-fail.
+in(X,[X|_]):-!.
+in(X,[Y|L]):-in(X,L).
 
-  %%%%%IMPRESSION DU SUDOKU%%%%%%%
+entreMinMax(Min,X,Max):-X>=Min,X=<Max.
+
+%%%%%IMPRESSION DU SUDOKU%%%%%%%
 
 congru(N,M,R) :-
 	I is (N mod M),
@@ -185,3 +208,6 @@ listToSudoku(G) :-
 %getElement(0,1,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
 %getElement(0,2,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
 %grille(L),listToSudoku(L),getElement(5,5,L,E),getLigne2(2,L,M),getCol1(2,L,C),getCarre(3,3,L,K).
+%valideElement(3, [1,2,4,5,6,7]).
+%in(1,[1,2,3,4,5,6,7,8,9]).
+%valideliste([1,2,3,4,5,6,7,8,9]).
