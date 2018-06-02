@@ -60,7 +60,6 @@ col9([a9,b9,c9,d9,e9,f9,g9,h9,i9]).
 
 %on considère que les lignes et le colonnes commencent à 0.
 
-%getElement(_,_,[],_):-!.
 getElement(0,0,[X|_],X).
 getElement(0,J,[_|L],X):- 
 	J2 is J-1,
@@ -89,10 +88,11 @@ getCol2(_,[],[],_).
 getCol2(J,[T|G],[T|L],C):- 
 	congru(C,9,J),!,
 	C1 is C+1,
-	getCol2(J,G,L,C1).
+	getCol2(J,G,L,C1),!.
 
-getCol2(J,[T|G],[_,_,_,_,_,_,_,_|L],C):- 
-	congru(C,9,J-8),!,
+getCol2(J,[T|G],[_,_,_,_,_,_,_,_|L],C):-
+	Rest=J+1 
+	congru(C,9,Rest),!,
 	C1 is C+8,
 	getCol2(J,G,L,C1).
 
@@ -106,6 +106,20 @@ getCarre(I,J,G,[Aij,Ai1j,Ai2j,Aij1,Ai1j1,Ai2j1,Aij2,Ai1j2,Ai2j2]):-
 	getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement(I+2,J,G,Ai2j),
     getElement(I,J+1,G,Aij1),getElement(I+1,J+1,G,Ai1j1),getElement(I+2,J+1,G,Ai2j1),
     getElement(I,J+2,G,Aij2),getElement(I+1,J+2,G,Ai1j2),getElement(I+2,J+2,G,Ai2j2).
+%getCarreAIJ permet de revoyer le carre asocié à l'élément en question CA marche
+getCarreAIJ(I,J,G,L):-
+	congru(I,3,0),
+	congru(J,3,0),
+	getCarre(I,J,G,L),!.
+
+getCarreAIJ(I,J,G,L):-
+	congru(I,3,0),
+	J1 is J-1,
+	getCarreAIJ(I,J1,G,L),!.
+getCarreAIJ(I,J,G,L):-
+	I1 is I-1,
+	getCarreAIJ(I1,J,G,L).
+
 
 %quel nom de variable pour le 3 e argument desetof dans validListe?
 valideGrille([]):- write("la grille est vide"),!.
