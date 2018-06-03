@@ -67,18 +67,12 @@ getElement(0,J,[_|L],X):-
 
 getElement(I,J,[_,_,_,_,_,_,_,_,_|L],X):-
 	I2 is I-1,
-	getElement(I2,J,L,X).
+	getElement(I2,J,L,X),!.
 
 getLigne2(0,[A,B,C,E,F,G,H,I,J|_],[A,B,C,E,F,G,H,I,J]):-!.
 getLigne2(I,[_,_,_,_,_,_,_,_,_|L],X):- 
-	I2 is I-1, getLigne2(I2,L,X).
-
-getLigne(_,[],_):-write("la ligne correspondante n'existe pas"),!.
-getLigne(I,G,L):- setof(X, getElement(I,_,G,X),L).
- %trouver un moyen de rassembler les resultats de cette requette dans une liste
-
-getCol(_,[],_):-write("la colonne correspondante n'existe pas"),!.
-getCol(J,G,L):- setof(X,getElement(_,J,G,X),L).
+	I2 is I-1,
+	getLigne2(I2,L,X).
 
 getCol1(J,G,L):-getCol2(J,G,L,0).
 
@@ -121,33 +115,32 @@ getCarreAIJ(I,J,G,L):-
 	getCarreAIJ(I1,J,G,L).
 
 
-%quel nom de variable pour le 3 e argument desetof dans validListe?
-valideGrille([]):- write("la grille est vide"),!.
-valideGrille(G):-getCarre(0,0,G,UL),getCarre(3,0,G,UM),getCarre(6,0,G,UR),
-                    getCarre(0,3,G,ML),getCarre(3,3,G,MM),getCarre(6,3,G,MR),
-                    getCarre(0,6,G,LL),getCarre(3,6,G,LM),getCarre(6,6,G,DR),
-                    valideliste(UL),valideliste(UM),valideliste(UR),
-                    valideliste(UL),valideliste(UL),valideliste(UL),
-                    valideliste(UL),valideliste(UL),valideliste(UL),!.
+valideCarres(G):-
+	getCarre(0,0,G,UL),getCarre(3,0,G,UM),getCarre(6,0,G,UR),
+    getCarre(0,3,G,ML),getCarre(3,3,G,MM),getCarre(6,3,G,MR),
+    getCarre(0,6,G,LL),getCarre(3,6,G,LM),getCarre(6,6,G,DR),
+    valideliste(UL),valideliste(UM),valideliste(UR),
+    valideliste(ML),valideliste(MM),valideliste(MR),
+    valideliste(LL),valideliste(LL),valideliste(LL),!.
 
-valideGrilleTest(G):-getCarre(0,0,G,C),valideliste(C),!.
+valideGrille(G):-
+	valideLignes(G,0),
+	valideCols(G,0),
+	valideCarres(G).
 
-valideLignesCols(G,-1).
-valideLignesCols(G,K):-
-	getCol1(K,G,J),
-	getLigne2(K,G,I),
-	valideliste(J),
-	valideliste(I),
-	K1=K-1,
-	valideLignesCols(G,K1),!.
+valideCols(_,9):-!.
+valideCols(G,I):-
+	getCol1(I,G,L),
+	valideliste(L),
+	I1 is I+1,
+	valideCols(G,I1).
 
-valideLignes(G,1):-!.
-valideLignes(G,K):-
-	getLigne2(K,G,I),
-	valideliste(I),
-	K1=K-1,
-	valideLignes(G,K1).
-
+valideLignes(_,9):-!.
+valideLignes(G,I):-
+	getLigne2(I,G,L),
+	valideliste(L),
+	I1 is I+1,
+	valideLignes(G,I1).
 
 %Complexite de O(n3) pour valide liste avec n=9 pour le sudoku 9*9.
 
