@@ -1,4 +1,9 @@
 % Porojet de IA2
+
+set_prolog_flag(report_error,true).
+set_prolog_flag(unknown,error). 
+
+%Le zero est une case vide.
 chiffre([1,2,3,4,5,6,7,8,9,0]).
 
 /*grille([
@@ -21,7 +26,18 @@ grille([
 5,7,4,9,8,2,6,3,1,
 2,5,7,1,6,4,8,9,3,
 8,4,3,5,9,7,2,1,6,
-6,9,1,8,2,3,5,4,7 ]).
+6,9,1,8,2,3,5,4,7]).
+
+grilleVide([
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0]).
 
 grillecare([ul,um,ur,ml,mm,mr,dl,dm,dr]).
 ul([a1,a2,a3,b1,b2,b3,c1,c2,c3]).
@@ -59,15 +75,37 @@ col9([a9,b9,c9,d9,e9,f9,g9,h9,i9]).
 
 
 %on considère que les lignes et le colonnes commencent à 0.
+/*nToij(0,0,0):-!.
+nToij(0,J,J):-J<9,!.
+nToij(I,J,N):-
+	I1 is 1+I,
+	N1 is N-9,
+	nToij(I1,J,N1),!.*/
+
+nToij(I,J,N):-catch(I is N div 9, 
+        error(Err,_Context),
+        (write('instantiation_error'),fail)),J is N-I*9,!.
+nToij(I,J,N):-N is 9*I+J,!.
+
 
 getElement(0,0,[X|_],X).
 getElement(0,J,[_|L],X):- 
 	J2 is J-1,
 	getElement(0,J2,L,X).
-
 getElement(I,J,[_,_,_,_,_,_,_,_,_|L],X):-
 	I2 is I-1,
 	getElement(I2,J,L,X),!.
+
+
+
+setAij(A,0,0,[_|G],[A|G]):-!.
+setAij(A,0,J,[T|G],[T|Guptade]):-
+	J2 is J-1,
+	setAij(A,0,J2,G,Guptade),!.
+setAij(A,I,J,[T0,T1,T2,T3,T4,T5,T6,T7,T8|G],[T0,T1,T2,T3,T4,T5,T6,T7,T8|Guptade]):-
+	I2 is I-1,
+	setAij(A,I2,J,G,Guptade),!.
+
 
 getLigne2(0,[A,B,C,E,F,G,H,I,J|_],[A,B,C,E,F,G,H,I,J]):-!.
 getLigne2(I,[_,_,_,_,_,_,_,_,_|L],X):- 
@@ -150,13 +188,16 @@ valideliste([X|A]):- valideElementRapide(X, A),valideliste(A),!.
 valideElement(X, []).
 valideElement(X, [Y|Z]):- X\=Y,chiffre(C),in(X,C), valideElement(X,Z),!.
 
-valideElementRapide(X, []).
+valideElementRapide(X,[]).
+valideElementRapide(0,_).
 valideElementRapide(X, [Y|Z]):-X\=Y,valideElementRapide(X,Z),!.
 in(X,[]):-fail.
 in(X,[X|_]):-!.
 in(X,[Y|L]):-in(X,L).
 
 entreMinMax(Min,X,Max):-X>=Min,X=<Max.
+
+
 
 %%%%%IMPRESSION DU SUDOKU%%%%%%%
 
@@ -184,7 +225,7 @@ vSeparator(A):-
 
 cvSeparator(A):-
 	congru(A,27,26),!,
-	nl, write(' -----+-----+-----');
+	nl, write('+-----+-----+-----+');
 	true.
 
 listToSudoku(G) :-
@@ -204,3 +245,4 @@ listToSudoku(G) :-
 %valideElement(3, [1,2,4,5,6,7]).
 %in(1,[1,2,3,4,5,6,7,8,9]).
 %valideliste([1,2,3,4,5,6,7,8,9]).
+%grille(G),listToSudoku(G),insererAij(2,0,0,G,H),listToSudoku(H).
