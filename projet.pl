@@ -1,8 +1,5 @@
 % Porojet de IA2
 
-set_prolog_flag(report_error,true).
-set_prolog_flag(unknown,error). 
-
 %Le zero est une case vide.
 chiffre([1,2,3,4,5,6,7,8,9,0]).
 
@@ -87,10 +84,8 @@ nToij(I,J,N):-catch(I is N div 9,
         (write('instantiation_error'),fail)),J is N-I*9,!.
 nToij(I,J,N):-N is 9*I+J,!.
 
-%getElement2(0,0,[X|_],X).
 getElement2(I,J,G,X):- 
-
-	getElementN(N,G,X),	nToij(I,J,N).
+	getElementN(N,G,X),	nToij(I,J,N),!.
 
 getElementN(0,[X|_],X).
 getElementN(N,[_|G],X):-
@@ -116,6 +111,23 @@ setAij(A,0,J,[T|G],[T|Guptade]):-
 setAij(A,I,J,[T0,T1,T2,T3,T4,T5,T6,T7,T8|G],[T0,T1,T2,T3,T4,T5,T6,T7,T8|Guptade]):-
 	I2 is I-1,
 	setAij(A,I2,J,G,Guptade),!.
+
+remplirCase(G,G1):-remplirCaseVide(G,G1,8).
+
+remplirCaseVide(G,G1,C):-
+	C>0,
+	getElement2(I,J,G,0),
+	setAij(C,I,J,G,G1),
+	getCol1(J,G1,Col),
+	valideliste(Col),
+	getLigne2(I,G1,Lig),
+	valideliste(Lig),
+	getCarre(I,J,G1,Car),
+	valideliste(Car),!.
+
+remplirCaseVide(G,G1,C):-
+	C1 is C-1,
+	remplirCaseVide(G,G1,C1).
 
 
 getLigne2(0,[A,B,C,E,F,G,H,I,J|_],[A,B,C,E,F,G,H,I,J]):-!.
@@ -257,3 +269,7 @@ listToSudoku(G) :-
 %in(1,[1,2,3,4,5,6,7,8,9]).
 %valideliste([1,2,3,4,5,6,7,8,9]).
 %grille(G),listToSudoku(G),insererAij(2,0,0,G,H),listToSudoku(H).
+%grille(G),chiffre(C),in(J,C),setof(X,getElement(0,J,G,X),L).
+% grille(G),setAij(0,0,0,G,G1),getElement2(I,J,G1,0),setAij(5,I,J,G1,G2).
+%grille(G),setAij(0,3,1,G,G1),getElement2(I,J,G1,0),setAij(5,I,J,G1,G2).
+%grilleVide(G),remplirCase(G,G1).
