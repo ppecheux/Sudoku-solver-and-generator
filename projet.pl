@@ -87,6 +87,17 @@ nToij(I,J,N):-catch(I is N div 9,
         (write('instantiation_error'),fail)),J is N-I*9,!.
 nToij(I,J,N):-N is 9*I+J,!.
 
+%getElement2(0,0,[X|_],X).
+getElement2(I,J,G,X):- 
+
+	getElementN(N,G,X),	nToij(I,J,N).
+
+getElementN(0,[X|_],X).
+getElementN(N,[_|G],X):-
+	getElementN(N1,G,X),
+	N is N1+1.
+
+
 
 getElement(0,0,[X|_],X).
 getElement(0,J,[_|L],X):- 
