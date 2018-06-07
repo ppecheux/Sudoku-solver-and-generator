@@ -25,6 +25,17 @@ grille([
 8,4,3,5,9,7,2,1,6,
 6,9,1,8,2,3,5,4,7]).
 
+grilleP([
+0,1,5,6,3,0,9,7,2,
+0,0,0,4,7,9,1,8,5,
+7,8,0,2,1,5,3,6,4,
+9,2,6,3,4,1,7,5,8,
+1,3,8,7,5,6,4,2,9,
+5,7,4,9,8,2,6,3,1,
+2,5,7,1,6,4,8,9,3,
+8,4,3,5,9,7,2,1,6,
+6,9,1,8,2,3,5,4,7]).
+
 grilleVide([
 0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,
@@ -112,7 +123,7 @@ setAij(A,I,J,[T0,T1,T2,T3,T4,T5,T6,T7,T8|G],[T0,T1,T2,T3,T4,T5,T6,T7,T8|Guptade]
 	I2 is I-1,
 	setAij(A,I2,J,G,Guptade),!.
 
-remplirCase(G,G1):-remplirCaseVide(G,G1,8).
+remplirCase(G,G1):-remplirCaseVide(G,G1,9).
 
 remplirCaseVide(G,G1,C):-
 	C>0,
@@ -122,12 +133,16 @@ remplirCaseVide(G,G1,C):-
 	valideliste(Col),
 	getLigne2(I,G1,Lig),
 	valideliste(Lig),
-	getCarre(I,J,G1,Car),
+	getCarreAIJ(I,J,G1,Car),
 	valideliste(Car),!.
 
 remplirCaseVide(G,G1,C):-
 	C1 is C-1,
 	remplirCaseVide(G,G1,C1).
+
+solve(G,G):- \+getElement2(I,J,G,0),valideGrille(G),!.
+
+solve(G,G1):- remplirCase(G,Guptade), solve(Guptade,G1).
 
 
 getLigne2(0,[A,B,C,E,F,G,H,I,J|_],[A,B,C,E,F,G,H,I,J]):-!.
@@ -272,4 +287,6 @@ listToSudoku(G) :-
 %grille(G),chiffre(C),in(J,C),setof(X,getElement(0,J,G,X),L).
 % grille(G),setAij(0,0,0,G,G1),getElement2(I,J,G1,0),setAij(5,I,J,G1,G2).
 %grille(G),setAij(0,3,1,G,G1),getElement2(I,J,G1,0),setAij(5,I,J,G1,G2).
-%grilleVide(G),remplirCase(G,G1).
+%grilleVide(G),remplirCase(G,G1),remplirCase(G1,G2).
+%grille(G),solve(G,G1).
+%grille(G),getElement2(I,J,G,0),setAij(8,I,J,G,G1),getCol1(J,G1,Col),valideliste(Col).
