@@ -6,7 +6,3 @@ long([_|L],X):-long(L,RE),X is RE+1.
 %git add test.pl // pour mettre le fichier dans le commit.
 %git commit -m "commentaire"
 %git push origin master
-
-%pour importer
-%git fetch
-%git pull
