@@ -14,6 +14,11 @@ grille([
 8,4,3,5,9,7,2,1,6,
 6,9,1,8,2,3,5,4,7]).
 
+%Exemple de grille à résoudre:
+%3 0 7 0 0 0 0 0 1 0 4 0 0 0 8 7 0 0 8 5 0 0 0 0 2 4 0 7 0 3 0 5 0 0 1 2 5 0 0 8 0 6 0 0 3 6 2 0 0 7 0 5 0 4 0 7 2 0 0 0 0 5 8 0 0 5 3 0 0 0 9 0 4 0 0 0 0 0 1 0 6
+
+grilleM([3,0,7,0,0,0,0,0,1,0,4,0,0,0,8,7,0,0,8,5,0,0,0,0,2,4,0,7,0,3,0,5,0,0,1,2,5,0,0,8,0,6,0,0,3,6,2,0,0,7,0,5,0,4,0,7,2,0,0,0,0,5,8,0,0,5,3,0,0,0,9,0,4,0,0,0,0,0,1,0,6]).
+
 grilleP([
 0,1,5,6,3,0,9,7,2,
 0,0,0,4,7,9,1,8,5,
@@ -108,18 +113,6 @@ remplirCaseVideRan(G,G1,C):-
 	C1 is C-1,
 	remplirCaseVideRan(G,G1,C1).
 
-remplirCaseVideRandom(G,G1,C,List):-
-	C>0,
-	chercheElement(C, List, E),
-	getElement2(I,J,G,0),
-	setAij(E,I,J,G,G1),
-	getCol1(J,G1,Col),
-	valideliste(Col),
-	getLigne2(I,G1,Lig),
-	valideliste(Lig),
-	getCarreAIJ(I,J,G1,Car),
-	valideliste(Car).
-
 
 remplirGrille(G, Res):- 			remplirGrille2(G, G, Res).
 
@@ -133,14 +126,6 @@ remplirGrille2(G, [0|G1], Res):- 	remplirCaseRan(G,G2),
 remplirGrille2(G, [A|G1], Res):- 	A\==0,
 									remplirGrille2(G, G1, Res).
 
-remplirGrilleUtilisateur(G, Res):- 				remplirGrilleUtilisateur2(G, G, Res).
-
-remplirGrilleUtilisateur2(G, [], Res):- 		Res=G.
-
-remplirGrilleUtilisateur2(G, [0|G1], Res):- 	remplirCase(G,G2),
-												valideGrille(G2),
-												listToSudoku(G2),
-												remplirGrilleUtilisateur2(G2, G1, Res).
 
 remplirGrille2(G, [A|G1], Res):- 	A\==0,
 									remplirGrille2(G, G1, Res).
@@ -150,7 +135,7 @@ remplir(G, Res):- 			remplir2(G,G,Res).
 remplir2(G, [], Res):- 		Res=G, writeln('GAGNE').
 
 remplir2(G, [0|G1], Res):-  repeat, 
-							writeln('Ligne a remplir: (solve pour résoudre)'),
+							writeln('Ligne a remplir:'),
 							readln([I|_]),
 							writeln('Colonne a remplir de la ligne '),
 							readln([J|_]),
@@ -187,7 +172,7 @@ sudoku():-	writeln('Solutionner une grille?(Y/N)'),
 			writeln('Entrez la grille sous la forme => 0 3 6 0 9 ...'),
 			readln(G),
 			listToSudoku(G),
-			remplirGrille(G, Res),
+			solve(G, Res),
 			listToSudoku(Res).
 
 play():- 	grilleVide(G),
@@ -349,5 +334,5 @@ listToSudoku(G) :-
 % grille(G),setAij(0,0,0,G,G1),getElement2(I,J,G1,0),setAij(5,I,J,G1,G2).
 %grille(G),setAij(0,3,1,G,G1),getElement2(I,J,G1,0),setAij(5,I,J,G1,G2).
 %grilleVide(G),remplirCase(G,G1),remplirCase(G1,G2).
-%grille(G),solve(G,G1).
+%grille(M),solve(M,G1).
 %grille(G),getElement2(I,J,G,0),setAij(8,I,J,G,G1),getCol1(J,G1,Col),valideliste(Col).
