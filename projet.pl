@@ -1,7 +1,9 @@
 % Porojet de IA2
-
+	
 %Le zero est une case vide.
 chiffre([1,2,3,4,5,6,7,8,9,0]).
+%Exemple de grille à résoudre:
+%3 0 7 0 0 0 0 0 1 0 4 0 0 0 8 7 0 0 8 5 0 0 0 0 2 4 0 7 0 3 0 5 0 0 1 2 5 0 0 8 0 6 0 0 3 6 2 0 0 7 0 5 0 4 0 7 2 0 0 0 0 5 8 0 0 5 3 0 0 0 9 0 4 0 0 0 0 0 1 0 6
 
 grille([
 4,1,5,6,3,8,9,7,2,
@@ -14,10 +16,16 @@ grille([
 8,4,3,5,9,7,2,1,6,
 6,9,1,8,2,3,5,4,7]).
 
-%Exemple de grille à résoudre:
-%3 0 7 0 0 0 0 0 1 0 4 0 0 0 8 7 0 0 8 5 0 0 0 0 2 4 0 7 0 3 0 5 0 0 1 2 5 0 0 8 0 6 0 0 3 6 2 0 0 7 0 5 0 4 0 7 2 0 0 0 0 5 8 0 0 5 3 0 0 0 9 0 4 0 0 0 0 0 1 0 6
-
-grilleM([3,0,7,0,0,0,0,0,1,0,4,0,0,0,8,7,0,0,8,5,0,0,0,0,2,4,0,7,0,3,0,5,0,0,1,2,5,0,0,8,0,6,0,0,3,6,2,0,0,7,0,5,0,4,0,7,2,0,0,0,0,5,8,0,0,5,3,0,0,0,9,0,4,0,0,0,0,0,1,0,6]).
+grilleM([
+3,0,7,0,0,0,0,0,1,
+0,4,0,0,0,8,7,0,0,
+8,5,0,0,0,0,2,4,0,
+7,0,3,0,5,0,0,1,2,
+5,0,0,8,0,6,0,0,3,
+6,2,0,0,7,0,5,0,4,
+0,7,2,0,0,0,0,5,8,
+0,0,5,3,0,0,0,9,0,
+4,0,0,0,0,0,1,0,6]).
 
 grilleP([
 0,1,5,6,3,0,9,7,2,
@@ -42,11 +50,18 @@ grilleVide([
 0,0,0,0,0,0,0,0,0]).
 
 
-nToij(I,J,N):-catch(I is N div 9, 
+%permet de renvoyer la position de la case Aij si on considère sa position dans une 
+%liste ou de renvoyer les coordonnées IJ quand on a la position N de la valeur dans une liste
+nToij(I,J,N):-
+		catch(I is N div 9, 
         error(Err,_Context),
         (write('instantiation_error'),fail)),J is N-I*9,!.
-nToij(I,J,N):-N is 9*I+J,!.
 
+nToij(I,J,N):- N is 9*I+J,!.
+
+
+
+%permet de retourner l’élément de la liste représentant le sodoku 9*9 G à la place ij dans une variable X.
 getElement2(I,J,G,X):- 
 	getElementN(N,G,X),	nToij(I,J,N),!.
 
@@ -54,8 +69,6 @@ getElementN(0,[X|_],X).
 getElementN(N,[_|G],X):-
 	getElementN(N1,G,X),
 	N is N1+1.
-
-
 
 getElement(0,0,[X|_],X).
 getElement(0,J,[_|L],X):- 
@@ -66,7 +79,7 @@ getElement(I,J,[_,_,_,_,_,_,_,_,_|L],X):-
 	getElement(I2,J,L,X),!.
 
 
-
+%permet de changer la valeur de l’élément aij du sudoku.
 setAij(A,0,0,[_|G],[A|G]):-!.
 setAij(A,0,J,[T|G],[T|Guptade]):-
 	J2 is J-1,
@@ -76,9 +89,13 @@ setAij(A,I,J,[T0,T1,T2,T3,T4,T5,T6,T7,T8|G],[T0,T1,T2,T3,T4,T5,T6,T7,T8|Guptade]
 	setAij(A,I2,J,G,Guptade),!.
 
 
+
+
+
+%permet de donner le résultat d’une grille partiellement remplie par l’utilisateur. 
+%Elle est utilisée également pour générer une grille avec une solution complète aléatoire au début du jeu.
 remplirCase(G,G1):-			remplirCaseVide(G,G1,9).
 
-remplirCaseRan(G,G1):-			remplirCaseVideRan(G,G1,9).
 
 remplirCaseVide(G,G1,C):-
 							C>0,
@@ -95,6 +112,8 @@ remplirCaseVide(G,G1,C):-
 	C >0,
 	C1 is C-1,
 	remplirCaseVide(G,G1,C1).
+
+remplirCaseRan(G,G1):-			remplirCaseVideRan(G,G1,9).
 
 remplirCaseVideRan(G,G1,C):-
 							C>0,
@@ -113,7 +132,6 @@ remplirCaseVideRan(G,G1,C):-
 	C1 is C-1,
 	remplirCaseVideRan(G,G1,C1).
 
-
 remplirGrille(G, Res):- 			remplirGrille2(G, G, Res).
 
 remplirGrille2(G, [], Res):- 		Res=G.
@@ -130,6 +148,11 @@ remplirGrille2(G, [A|G1], Res):- 	A\==0,
 remplirGrille2(G, [A|G1], Res):- 	A\==0,
 									remplirGrille2(G, G1, Res).
 
+
+
+
+%demande à l’utilisateur d‘insérer une valeur à une certaine coordonnées tant qu’il
+%existe une case vide. Affiche ‘GAGNE’ quand la grille est remplie.
 remplir(G, Res):- 			remplir2(G,G,Res).
 
 remplir2(G, [], Res):- 		Res=G, writeln('GAGNE').
@@ -154,13 +177,23 @@ remplir2(G, [A|G1],Res):- 	A\==0,
 remplir2(G, G1, Res):- 	remplirGrilleUtilisateur(G, Res),
 						listToSudoku(Res).
 
-vidageGrille(G, G, 0).
+
+%permet de mettre N fois un 0 dans la grille à des emplacements aléatoires.
+vidageGrille(G, G, 0):- 	nbSolutions(G,Nb),
+							write('Nombre de soltuion possible: '),
+							writeln(Nb).
 vidageGrille(G, G1, N):- 	N>0, N1 is N-1,
 							random_between(0,8, I),
 							random_between(0,8, J),
 							setAij(0, I, J, G, G2),
 							vidageGrille(G2, G1, N1).
 
+
+
+
+%Fonction permettant de lancer le programme. Cela demande si on veut solutionner 
+%une grille partiellement remplie ou jouer et lance play() ou remplirGrille(G,Gresultat) 
+%en fonction de cette réponse.
 sudoku():-	writeln('Jouer?(Y/N)'),
 			readln([X]),
 			X=='Y', !,
@@ -175,26 +208,39 @@ sudoku():-	writeln('Solutionner une grille?(Y/N)'),
 			solve(G, Res),
 			listToSudoku(Res).
 
+%permet de jouer. Créer une grille aléatoire avec une solution. Permet au joueur de choisir
+%une difficulté (nombre de case à supprimer) .  Appelle ensuite remplirGrille(G, Gresultat) 
+%avec une grille vide pour générée une solution, supprime ensuite des cases et appelle 
+%remplir(G, Gresultat) pour remplir la grille.
 play():- 	grilleVide(G),
 			remplirGrille(G, G1),
 			%listToSudoku(G1),
-			writeln('Choisissez le nombre de cases vides (entre 0 et 81):'),
+			writeln('Choisissez le nombre de cases vides (entre 0 et 65):'),
 			readln([X]),
+			X < 66,
 			vidageGrille(G1, G2, X),
 			listToSudoku(G2),
-			remplir(G2, Res).	
+			remplir(G2, Res).
+			
 
-
+%permet de donner la solution d‘une grille partiellement remplie rapidement !
 solve(G,G):- \+getElement2(I,J,G,0),valideGrille(G),!.
 
 solve(G,G1):- remplirCase(G,Guptade), solve(Guptade,G1).
 
 
+
+%permet de retourner dans la liste L les éléments de la ligne I
+% dans la liste représentant le sodoku 9*9 G.
 getLigne2(0,[A,B,C,E,F,G,H,I,J|_],[A,B,C,E,F,G,H,I,J]):-!.
 getLigne2(I,[_,_,_,_,_,_,_,_,_|L],X):- 
 	I2 is I-1,
 	getLigne2(I2,L,X).
 
+
+
+%permet de retourner dans la liste L les éléments de la colonne J 
+%dans la liste représentant le sodoku 9*9 G.
 getCol1(J,G,L):-getCol2(J,G,L,0).
 
 getCol2(_,_,[],81).
@@ -215,8 +261,13 @@ getCol2(J,[T|G],L,C):-
 	C1 is C+1,
 	getCol2(J,G,L,C1).
 
+
+
+
 %LES CARRES SONT IDENTIFIES PAR LES iNDICES DE LA CASE EN HAUT A GAUCHE DU CARRE
 %ATTENTION IL DONNE DEUX SOLUTIONS PUIS ENVOIE FALSE
+%permet de renvoyer le carré associé à l‘élément de la liste représentant le
+% sodoku 9*9 G à l’indice IJ sous la forme d’une liste L.
 getCarre(I,J,G,[Aij,Ai1j,Ai2j,Aij1,Ai1j1,Ai2j1,Aij2,Ai1j2,Ai2j2]):-
 	getElement(I,J,G,Aij),getElement(I+1,J,G,Ai1j),getElement(I+2,J,G,Ai2j),
     getElement(I,J+1,G,Aij1),getElement(I+1,J+1,G,Ai1j1),getElement(I+2,J+1,G,Ai2j1),
@@ -236,6 +287,10 @@ getCarreAIJ(I,J,G,L):-
 	getCarreAIJ(I1,J,G,L).
 
 
+
+
+%s’effacent quand toutes les colonnes/lignes depuis la colonne I sont 
+%valides ou lorsque tous les carrés du sudoku sont valides.
 valideCarres(G):-
 	getCarre(0,0,G,UL),getCarre(3,0,G,UM),getCarre(6,0,G,UR),
     getCarre(0,3,G,ML),getCarre(3,3,G,MM),getCarre(6,3,G,MR),
@@ -243,11 +298,6 @@ valideCarres(G):-
     valideliste(UL),valideliste(UM),valideliste(UR),
     valideliste(ML),valideliste(MM),valideliste(MR),
     valideliste(LL),valideliste(LL),valideliste(LL),!.
-
-valideGrille(G):-
-	valideLignes(G,0),
-	valideCols(G,0),
-	valideCarres(G).
 
 valideCols(_,9):-!.
 valideCols(G,I):-
@@ -264,14 +314,28 @@ valideLignes(G,I):-
 	valideLignes(G,I1).
 
 
-%Complexite de O(n3) pour valide liste avec n=9 pour le sudoku 9*9.
 
+
+%s’efface lorsque les éléments de la liste G respectent les règles du sudoku.
+valideGrille(G):-
+	valideLignes(G,0),
+	valideCols(G,0),
+	valideCarres(G).
+
+
+
+%s‘efface quand tous les éléments de la liste L sont uniques compris entre 1 et 9.
+%Complexite de O(n3) pour valide liste avec n=9 pour le sudoku 9*9.
 valideliste([]).
 valideliste([X|A]):- valideElementRapide(X, A),valideliste(A),!.
 
+
+%s’efface quand l’élément X est un entier de 1 à 9 mais n’est pas dans la liste L.
 valideElement(X, []).
 valideElement(X, [Y|Z]):- X\=Y,chiffre(C),in(X,C), valideElement(X,Z),!.
 
+
+%s’efface quand l’élément X est entre 1 et 9 et n’est pas dans la liste L.
 valideElementRapide(X,[]).
 valideElementRapide(0,_).
 valideElementRapide(X, [Y|Z]):-X\=Y,valideElementRapide(X,Z),!.
@@ -279,11 +343,27 @@ in(X,[]):-fail.
 in(X,[X|_]):-!.
 in(X,[Y|L]):-in(X,L).
 
+
+%s’efface si Min<=X=<Max.
 entreMinMax(Min,X,Max):-X>=Min,X=<Max.
 
+%Renvoie toutes les solutions de G dans la liste L
+toutesSoltutions(G,L):-
+	setof(X,solve(G,X),L).
+
+%Calcul la longueur d‘une liste
+longueurListe([],0):-!.
+longueurListe([T|L],NbElem):-
+	longueurListe(L,NbElemSansT),
+	NbElem is NbElemSansT+1.
+
+%Renvoie dans Nb le nombre de solution pour une grille G
+nbSolutions(G,Nb):-
+	toutesSoltutions(G,L),
+	longueurListe(L,Nb).
 
 
-%%%%%IMPRESSION DU SUDOKU%%%%%%%
+%%%%%%% IMPRESSION DU SUDOKU %%%%%%%
 
 congru(N,M,R) :-
 	I is (N mod M),
@@ -312,16 +392,18 @@ cvSeparator(A):-
 	nl, write('+-----+-----+-----+');
 	true.
 
+%permet d’afficher la liste G sous forme de sudoku dans la console
 listToSudoku(G) :-
   vSeparator(-1),%ligne du haut
   listToSudoku(G,0).
 
-  %%%%%TESTS DES PREDICATS%%%%%%%
 
-  % listToSudoku([8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1]).
- %listToSudoku([8,0,4,0,0,0,2,0,9]).
-  %listToSudoku([8,0,4,0,0,0,2,0,9]).
-  %getLigne(1,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],L).
+%%%%%%% TESTS DES PREDICATS %%%%%%%
+
+%listToSudoku([8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1]).
+%listToSudoku([8,0,4,0,0,0,2,0,9]).
+%listToSudoku([8,0,4,0,0,0,2,0,9]).
+%getLigne(1,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],L).
 %getElement(0,0,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
 %getElement(0,1,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
 %getElement(0,2,[8,0,4,0,0,0,2,0,9,0,0,9,0,0,0,1,0,0,1,0,0,3,0,2,0,0,7,0,5,0,1,0,4,0,8,0,0,0,0,0,3,0,0,0,0,0,1,0,7,0,9,0,2,0,5,0,0,4,0,3,0,0,8,0,0,3,0,0,0,4,0,0,4,0,6,0,0,0,3,0,1],X).
